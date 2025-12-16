@@ -1,0 +1,11 @@
+{
+    "User": true,
+    "Product": true,
+    "Order": true,
+    "OrderItem": true,
+    "Warehouse": true,
+    "Stock": true,
+    "Payment": true,
+    "ReturnProduct": true,
+    "Delivery": true
+}

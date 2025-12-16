@@ -1,0 +1,11 @@
+{
+    "name": "ReturnProduct",
+    "alias": "returnproduct",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ReturnProduct\\Providers\\ReturnProductServiceProvider"
+    ],
+    "files": []
+}
