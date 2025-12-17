@@ -2,49 +2,57 @@
 
 namespace Modules\User\Http\Controllers\V1;
 
-use Illuminate\Http\Request;
-use Modules\User\Models\User;
-use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Eloquent\Model;
+use App\Traits\ApiResponseTrait;
+use Illuminate\Http\Request;
+use Modules\User\App\Interfaces\UserInterface;
 use Modules\User\Http\Requests\V1\UserRequest;
+use Modules\User\Models\User;
 
 class UserController extends Controller
 {
-     use ApiResponseTrait;
+    use ApiResponseTrait;
+
+    protected $UserRepository;
+
+    public function __construct(UserInterface $UserRepository)
+    {
+        $this->UserRepository = $UserRepository;
+    }
 
     public function index(Request $request)
     {
-        return User::orderByDesc('created_at')->cursorPaginate($request->paginateSize ?? 10);
+        return $this->UserRepository->index();
     }
 
     public function store(UserRequest $request)
     {
-       User::create($request->validated());
-       return $this->respondWithSuccess('User Created Successfully');
+        $this->UserRepository->store($request);
+
+        return $this->respondWithSuccess('User Created Successfully');
     }
 
-  
     public function show(User $user)
     {
         User::CheckOnThisUser($user);
+        $this->UserRepository->show($user);
+
         return $user->load(['orders']);
     }
 
-  
     public function update(UserRequest $request, User $user)
     {
-       User::CheckOnThisUser($user);
-       $user->update($request->validated());
-       return $this->respondWithSuccess('User Updated Successfully');
+        User::CheckOnThisUser($user);
+        $this->UserRepository->update($request, $user);
+
+        return $this->respondWithSuccess('User Updated Successfully');
     }
 
-  
-    public function destroy(User $user) 
+    public function delete(User $user)
     {
-       User::CheckOnThisUser($user);
-       $user->delete();
-       return $this->respondWithSuccess('User Deleted Now');
+        User::CheckOnThisUser($user);
+        $this->UserRepository->delete($user);
+
+        return $this->respondWithSuccess('User Deleted Now');
     }
-    
 }
