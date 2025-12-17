@@ -53,10 +53,10 @@ class User extends Authenticatable
     }
 
 
-      // function inside model
-    protected static function CheckOnThisUser($user) 
-    {
-         if(!$user)
-        return self::respondWithErrors('User Not Found');
-    }
+    //   // function inside model
+    // protected static function CheckOnThisUser($user) 
+    // {
+    //      if(!$user)
+    //     return self::respondWithErrors('User Not Found');
+    // }
 }

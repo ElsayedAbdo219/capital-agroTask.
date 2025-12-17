@@ -4,5 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Modules\Product\Http\Controllers\ProductController;
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('products', ProductController::class)->names('product');
+      Route::prefix('products')->name('products.')->group(function(){
+      Route::get('/',[ProductController::class,'index']);
+      Route::post('/',[ProductController::class,'store']);
+      Route::get('/{user}',[ProductController::class,'show']);
+      Route::put('/{user}',[ProductController::class,'update']);
+      Route::delete('/',[ProductController::class,'destroy']);
+    });
+
 });

@@ -34,7 +34,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        User::CheckOnThisUser($user);
+        $this->checkOnUser($user);
         $this->UserRepository->show($user);
 
         return $user->load(['orders']);
@@ -42,7 +42,7 @@ class UserController extends Controller
 
     public function update(UserRequest $request, User $user)
     {
-        User::CheckOnThisUser($user);
+        $this->checkOnUser($user);
         $this->UserRepository->update($request, $user);
 
         return $this->respondWithSuccess('User Updated Successfully');
@@ -50,9 +50,16 @@ class UserController extends Controller
 
     public function delete(User $user)
     {
-        User::CheckOnThisUser($user);
+        $this->checkOnUser($user);
         $this->UserRepository->delete($user);
 
         return $this->respondWithSuccess('User Deleted Now');
     }
+
+      public function checkOnUser($user)
+    {
+        if(!$user)
+        return self::respondWithErrors('User Not Found');
+    }
+
 }
