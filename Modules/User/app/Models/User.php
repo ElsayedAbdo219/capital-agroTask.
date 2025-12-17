@@ -2,6 +2,8 @@
 
 namespace Modules\User\Models;
 
+use Modules\Order\Models\Order;
+use App\Traits\ApiResponseTrait;
 use Modules\User\Enums\UserType;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFactory , HasApiTokens ;
+    use HasApiTokens , HasFactory, ApiResponseTrait;
 
     protected $fillable = [
         'name',
@@ -21,6 +23,9 @@ class User extends Authenticatable
         'type',
     ];
 
+  
+   
+    # Scopes
     public function scopeFilter($query, array $filters)
     {
         foreach ($filters as $key => $value) {
@@ -35,11 +40,24 @@ class User extends Authenticatable
                     $query->where('email', 'LIKE', "%{$value}%");
                     break;
                 case 'type':
-                    $query->whereIn('status',UserType::toArray());
+                    $query->whereIn('status', UserType::toArray());
                     break;
             }
         }
 
         return $query;
+    }
+   # Relations
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+
+      // function inside model
+    protected static function CheckOnThisUser($user) 
+    {
+         if(!$user)
+        return self::respondWithErrors('User Not Found');
     }
 }
