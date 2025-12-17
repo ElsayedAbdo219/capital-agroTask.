@@ -32,7 +32,7 @@ class UserController extends Controller
     }
 
   
-    public function update(Request $request, User $user)
+    public function update(UserRequest $request, User $user)
     {
        User::CheckOnThisUser($user);
        $user->update($request->validated());
