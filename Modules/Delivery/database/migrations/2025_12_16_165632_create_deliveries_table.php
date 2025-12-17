@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->foreignId('deliver_id')->constrained('users')->cascadeOnDelete();
             $table->text('address');
-            $table->json('phone'); // can be json 
+            $table->json('phone'); 
             $table->string('status')->default('pending'); // shipped, delivered
             $table->timestamp('delivered_at')->nullable();
             $table->timestamps();
