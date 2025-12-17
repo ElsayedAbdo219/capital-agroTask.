@@ -4,10 +4,8 @@ namespace Modules\User\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
 use Modules\User\Models\User;
-use App\Models\OtpAuthenticate;
 use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
 use Modules\User\App\Services\AuthService;
 use Modules\User\Http\Requests\V1\LoginClientRequest;
 use Modules\User\Http\Requests\V1\UpdatePasswordRequest;
@@ -53,7 +51,6 @@ class AuthController extends Controller
     {
       $this->AuthService->forgetPassword($request);
     }
-
     
     public function resetPassword(Request $request)
     {
