@@ -2,6 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\User\Http\Controllers\V1\UserController;
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('verifiedApi');
+Route::post('/forget-Password', [AuthController::class, 'forgetPassword']);
+Route::post('/verify-account', [AuthController::class, 'verifyAccount']);
+Route::post('/verify-Otp', [AuthController::class, 'verifyotp']);
+Route::post('/resendOtp', [AuthController::class, 'resendOtp']);
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Route::prefix('users')->name('users.')->group(function(){
