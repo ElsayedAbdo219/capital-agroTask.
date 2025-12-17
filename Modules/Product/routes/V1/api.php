@@ -7,8 +7,8 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
       Route::prefix('products')->name('products.')->group(function(){
       Route::get('/',[ProductController::class,'index']);
       Route::post('/',[ProductController::class,'store']);
-      Route::get('/{user}',[ProductController::class,'show']);
-      Route::put('/{user}',[ProductController::class,'update']);
+      Route::get('/{product}',[ProductController::class,'show']);
+      Route::put('/{product}',[ProductController::class,'update']);
       Route::delete('/',[ProductController::class,'destroy']);
     });
 
