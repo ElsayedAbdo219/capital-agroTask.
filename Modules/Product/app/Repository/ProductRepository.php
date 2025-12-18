@@ -2,9 +2,9 @@
 
 namespace Modules\Product\App\Interface;
 
-use Modules\User\Models\User;
+use Illuminate\Support\Facades\DB;
 use Modules\Product\Models\Product;
-use Modules\Product\App\Interface\ProductInterface;
+use Modules\Stock\Models\Stock;
 
 abstract class ProductRepository implements ProductInterface
 {
@@ -15,17 +15,37 @@ abstract class ProductRepository implements ProductInterface
 
     public function store($request)
     {
-        Product::create($request->validated());
+        DB::transaction(function () use ($request) {
+            $product = Product::create(
+                $request->validated()->except(['quantity', 'batch_no', 'expiry_date'])
+            );
+            Stock::create(
+                array_merge(
+                    $request->validated()->only(['quantity', 'batch_no', 'expiry_date']),
+                    ['product_id' => $product->id]
+                )
+            );
+        });
+
     }
 
     public function show($product)
     {
-        return $product->load(['orders']);
+        return $product->load(['stock']);
     }
 
     public function update($request, $product)
     {
-        $product->update($request->validated());
+            DB::transaction(function () use ($request,$product) {
+            $product->update(
+                $request->validated()->except(['quantity', 'batch_no', 'expiry_date'])
+            );
+            $product?->stock->array_merge(
+                    $request->validated()->only(['quantity', 'batch_no', 'expiry_date']),
+                    ['product_id' => $product->id]
+                );
+        });
+
     }
 
     public function delete($product)

@@ -2,8 +2,9 @@
 
 namespace Modules\Product\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Stock\Models\Stock;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 // use Modules\Product\Database\Factories\ProductFactory;
 
@@ -71,5 +72,10 @@ class Product extends Model
         }
 
         return $query;
+    }
+
+    public function stock()
+    {
+      return $this->hasOne(Stock::class);
     }
 }

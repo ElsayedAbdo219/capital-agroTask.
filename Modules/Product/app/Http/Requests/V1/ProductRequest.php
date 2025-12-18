@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Product\Http\Requests;
+namespace Modules\Product\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Modules\Product\Enums\AnimalTypes;
@@ -27,14 +27,17 @@ class ProductRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'sku' => ['required', 'string', 'max:100', 'unique:products,sku'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'tax' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'price' => ['required', 'numeric', 'min:1'],
+            'tax' => ['nullable', 'numeric', 'min:1', 'max:100'],
             'additional_data' => ['nullable', 'json'],
             'feed_type' => ['required', 'string', 'in:'.$productTypes],
             'animal_type' => ['required', 'string', 'in:'.$animalTypes],
-            'weight_per_unit' => ['required', 'numeric', 'min:0'],
+            'weight_per_unit' => ['required', 'numeric', 'min:1'],
             'is_returnable' => ['boolean'],
             'status' => ['nullable', 'string', 'in:'.$productTypes],
+            'quantity' => ['required', 'numeric', 'min:1'],
+            'batch_no' => ['required', 'numeric'],
+            'expiry_date' =>  ['required', 'date','after:now'],
         ];
     }
 
