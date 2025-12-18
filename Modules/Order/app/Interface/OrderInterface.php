@@ -10,8 +10,8 @@ interface OrderInterface
 
     public function store($request);
 
-    public function update($request);
+    public function update($request,$order);
 
     public function delete($id);
-    
+
 }

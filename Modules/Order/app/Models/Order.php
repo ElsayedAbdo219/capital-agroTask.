@@ -2,10 +2,11 @@
 
 namespace Modules\Order\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Modules\Order\Enums\OrderStatus;
 use Modules\User\Models\User;
+use Modules\Order\Enums\OrderStatus;
+use Illuminate\Database\Eloquent\Model;
+use Modules\OrderItem\Models\OrderItem;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model
 {
@@ -41,5 +42,10 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+      public function orderItem()
+    {
+        return $this->belongsTo(OrderItem::class);
     }
 }

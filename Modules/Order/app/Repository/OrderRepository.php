@@ -41,9 +41,37 @@ class OrderRepository implements OrderInterface
         }
     }
 
-    public function show($user) {}
+    public function show($order)
+    {
+        return $order;
+    }
 
-    public function update($request) {}
+    public function update($request, $order)
+    {
+        $data = $request->validated();
+        $data['user_id'] = auth('api')->id();
+        unset($data['product_id'],$data['unit_price']);
+        try {
+            DB::beginTransaction();
+            $order->update($data);
+            $order->orderItem?->update(
+                [
+                    'product_id' => $data['product_id'],
+                    'quantity' => $data['total_amount'],
+                    'unit_price' => $data['unit_price'],
+                    'total_price' => $data['total_amount'] * $data['unit_price'],
+                ]
+            );
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
 
-    public function delete($user) {}
+            return 'The Order Updating has Proplem , It'.$e;
+        }
+    }
+
+    public function delete($order)
+    {
+        $order->delete();
+    }
 }

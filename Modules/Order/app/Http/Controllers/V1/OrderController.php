@@ -2,55 +2,62 @@
 
 namespace Modules\Order\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Order\Models\Order;
+use App\Traits\ApiResponseTrait;
+use App\Http\Controllers\Controller;
+use Modules\App\Interface\OrderInterface;
+use Modules\Order\Http\Requests\V1\OrderRequest;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ApiResponseTrait;
+
+    protected $OrderInterface;
+
+    public function __construct(OrderInterface $OrderInterface)
     {
-        return view('order::index');
+        $this->OrderInterface = $OrderInterface;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function index(Request $request)
     {
-        return view('order::create');
+        return $this->OrderInterface->index();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function store(OrderRequest $request)
     {
-        return view('order::show');
+        $this->OrderInterface->store($request);
+
+        return $this->respondWithSuccess('Order Created Successfully');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function show(Order $order)
     {
-        return view('order::edit');
+        $this->checkOnOrder($order);
+        $this->OrderInterface->show($order);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
+    public function update(OrderRequest $request, Order $order)
+    {
+        $this->checkOnOrder($order);
+        $this->OrderInterface->update($request, $order);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+        return $this->respondWithSuccess('Order Updated Successfully');
+    }
+
+    public function delete(Order $order)
+    {
+        $this->checkOnOrder($order);
+        $this->OrderInterface->delete($order);
+
+        return $this->respondWithSuccess('Order Deleted Now');
+    }
+
+      public function checkOnOrder($order)
+    {
+        if(!$order)
+        return self::respondWithErrors('Order Not Found');
+    }
+    
 }
