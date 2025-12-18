@@ -2,55 +2,60 @@
 
 namespace Modules\Delivery\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Traits\ApiResponseTrait;
+use App\Http\Controllers\Controller;
+use Modules\Delivery\Models\Delivery;
+use Modules\App\Interface\DeliveryInterface;
+use Modules\Delivery\Http\Requests\V1\DeliveryRequest;
 
 class DeliveryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+  use ApiResponseTrait;
+    protected $DeliveryRepository;
+
+    public function __construct(DeliveryInterface $DeliveryRepository)
     {
-        return view('delivery::index');
+        $this->DeliveryRepository = $DeliveryRepository;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function index(Request $request)
     {
-        return view('delivery::create');
+        return $this->DeliveryRepository->index();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function store(DeliveryRequest $request)
     {
-        return view('delivery::show');
+        $this->DeliveryRepository->store($request);
+
+        return $this->respondWithSuccess('Delivery Created Successfully');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function show(Delivery $order)
     {
-        return view('delivery::edit');
+        $this->checkOnDelivery($order);
+        $this->DeliveryRepository->show($order);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
+    public function update(DeliveryRequest $request, Delivery $order)
+    {
+        $this->checkOnDelivery($order);
+        $this->DeliveryRepository->update($request, $order);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+        return $this->respondWithSuccess('Delivery Updated Successfully');
+    }
+
+    public function delete(Delivery $order)
+    {
+        $this->checkOnDelivery($order);
+        $this->DeliveryRepository->delete($order);
+
+        return $this->respondWithSuccess('Delivery Deleted Now');
+    }
+
+      public function checkOnDelivery($Delivery)
+    {
+        if(!$Delivery)
+        return self::respondWithErrors('Delivery Not Found');
+    }
 }
