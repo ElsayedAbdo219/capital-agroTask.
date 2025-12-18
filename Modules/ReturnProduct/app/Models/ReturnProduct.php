@@ -3,6 +3,7 @@
 namespace Modules\ReturnProduct\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\OrderItem\Models\OrderItem;
 use Modules\ReturnProduct\Enums\ReturnProductStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -38,5 +39,11 @@ class ReturnProduct extends Model
         }
 
         return $query;
+    }
+
+    # Relations
+    public function orderItem()
+    {
+      return $this->belongsTo(OrderItem::class);
     }
 }

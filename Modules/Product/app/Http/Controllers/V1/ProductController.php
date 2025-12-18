@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Traits\ApiResponseTrait;
 use Modules\Product\Models\Product;
 use App\Http\Controllers\Controller;
-use Modules\Product\Http\Requests\ProductRequest;
+use Modules\Product\Http\Requests\V1\ProductRequest;
 use Modules\Product\App\Interface\ProductInterface;
 class ProductController extends Controller
 {

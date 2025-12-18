@@ -14,14 +14,9 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $productTypesArray = ProductStatus::toArray();
-        $productTypes = implode(',', $productTypesArray);
-
-        $feedTypesArray = FeedTypes::toArray();
-        $productTypes = implode(',', $feedTypesArray);
-
-        $animalTypesArray = AnimalTypes::toArray();
-        $animalTypes = implode(',', $animalTypesArray);
+        $productTypes = implode(',',ProductStatus::toArray());
+        $productTypes = implode(',',FeedTypes::toArray());
+        $animalTypes = implode(',', AnimalTypes::toArray());
 
         return [
             'name' => ['required', 'string', 'max:255'],

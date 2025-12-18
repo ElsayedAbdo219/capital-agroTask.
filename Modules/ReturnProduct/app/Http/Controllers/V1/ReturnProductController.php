@@ -2,55 +2,60 @@
 
 namespace Modules\ReturnProduct\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Traits\ApiResponseTrait;
+use App\Http\Controllers\Controller;
+use Modules\ReturnProduct\Models\ReturnProduct;
+use Modules\ReturnProduct\App\Interface\ReturnProductInterface;
+use Modules\ReturnProduct\Http\Requests\V1\ReturnProductRequest;
 
 class ReturnProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ApiResponseTrait;
+    protected $ReturnProductRepository;
+
+    public function __construct(ReturnProductInterface $ReturnProductRepository)
     {
-        return view('returnproduct::index');
+        $this->ReturnProductRepository = $ReturnProductRepository;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function index(Request $request)
     {
-        return view('returnproduct::create');
+        return $this->ReturnProductRepository->index();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function store(ReturnProductRequest $request)
     {
-        return view('returnproduct::show');
+        $this->ReturnProductRepository->store($request);
+
+        return $this->respondWithSuccess('ReturnProduct Created Successfully');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function show(ReturnProduct $order)
     {
-        return view('returnproduct::edit');
+        $this->checkOnReturnProduct($order);
+        $this->ReturnProductRepository->show($order);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
+    public function update(ReturnProductRequest $request, ReturnProduct $order)
+    {
+        $this->checkOnReturnProduct($order);
+        $this->ReturnProductRepository->update($request, $order);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+        return $this->respondWithSuccess('ReturnProduct Updated Successfully');
+    }
+
+    public function delete(ReturnProduct $order)
+    {
+        $this->checkOnReturnProduct($order);
+        $this->ReturnProductRepository->delete($order);
+
+        return $this->respondWithSuccess('ReturnProduct Deleted Now');
+    }
+
+      public function checkOnReturnProduct($returnProduct)
+    {
+        if(!$returnProduct)
+        return self::respondWithErrors('ReturnProduct Not Found');
+    }
 }
