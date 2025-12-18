@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'fawaterak' => [
+        'test_api_key' => env('FAWATEREK_TEST_API_KEY','6add84ee1a910b3dc1cfef8a92f580c5eef5493221e45af70e'),
+        // 'live_api_key' =>  env('FAWATEREK_LIVE_API_KEY',''),
+    ],
+
 ];
