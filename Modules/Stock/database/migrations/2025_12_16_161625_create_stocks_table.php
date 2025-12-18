@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('warehouse_id')->constrained()->cascadeOnDelete();
+            // $table->foreignId('warehouse_id')->constrained()->cascadeOnDelete();
             $table->integer('quantity');
             $table->string('batch_no');
             $table->date('expiry_date')->nullable();

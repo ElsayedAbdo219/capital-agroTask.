@@ -7,5 +7,6 @@
     "Stock": true,
     "Payment": true,
     "ReturnProduct": true,
-    "Delivery": true
+    "Delivery": true,
+    "Invoice": true
 }

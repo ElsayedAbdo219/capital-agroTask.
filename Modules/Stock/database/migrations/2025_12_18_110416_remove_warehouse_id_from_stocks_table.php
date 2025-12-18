@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('warehouses', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('location')->default("Dokki");
-            $table->timestamps();
+        Schema::table('stocks', function (Blueprint $table) {
+            $table->dropForeign(['warehouse_id']);
+            $table->dropColumn('warehouse_id');
         });
     }
 
@@ -24,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('warehouses');
+        Schema::table('stocks', function (Blueprint $table) {
+            
+        });
     }
 };
