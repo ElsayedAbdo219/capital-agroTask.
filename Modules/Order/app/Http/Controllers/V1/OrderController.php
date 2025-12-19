@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Order\Http\Controllers;
+namespace Modules\Order\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
 use Modules\Order\Models\Order;

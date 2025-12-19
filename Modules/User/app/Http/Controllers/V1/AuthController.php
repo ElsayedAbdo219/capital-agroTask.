@@ -4,9 +4,11 @@ namespace Modules\User\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
 use Modules\User\Models\User;
+use App\Models\OtpAuthenticate;
 use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use Modules\User\App\Services\AuthService;
+use Modules\User\Http\Requests\VerifyOtpRequest;
 use Modules\User\Http\Requests\V1\LoginClientRequest;
 use Modules\User\Http\Requests\V1\ResetPasswordRequest;
 use Modules\User\Http\Requests\V1\ForgetPasswordRequest;
@@ -46,7 +48,7 @@ class AuthController extends Controller
         $user = auth('api')->user();
         $newAccessToken = $user->createToken('access-token', ['*'], now()->addMinutes(60))->plainTextToken;
         $newRefreshToken = $user->createToken('refresh-token', ['refresh'], now()->addDays(7))->plainTextToken;
-        
+
         return response()->json([
             'access_token' => $newAccessToken,
             'refresh_token' => $newRefreshToken,
@@ -55,27 +57,42 @@ class AuthController extends Controller
         ]);
     }
 
-    public function verifyOtp(Request $request)
+   public function verifyOtp(VerifyOtpRequest $request)
     {
-        $this->AuthService->refreshToken($request);
-        return $this->respondWithSuccess('User verified successfully!');
+        $this->AuthService->verifyOtp(
+            $request->validated('email'),
+            $request->validated('otp')
+        );
+      return $this->respondWithSuccess('User verified successfully!');
     }
+
+
+    
 
     public function verifyAccount(Request $request)
     {
-      $this->AuthService->verifyAccount($request);
+        $this->AuthService->verifyAccount($request);
     }
 
     public function resendOtp(Request $request)
     {
-      $this->AuthService->resendOtp($request);
+        $this->AuthService->resendOtp($request);
     }
 
     public function forgetPassword(ForgetPasswordRequest $request)
     {
-      $this->AuthService->forgetPassword($request);
+        $result = $this->AuthService->forgetPassword(
+            $request->validated('email')
+        );
+
+        return response()->json([
+            'message' => 'OTP has been sent successfully',
+            'data' => [
+                'test-otp-only' => $result['otp'],
+            ],
+        ]);
     }
-    
+
     public function resetPassword(ResetPasswordRequest $request)
     {
         $this->AuthService->resetPassword($request);
@@ -83,12 +100,11 @@ class AuthController extends Controller
 
     public function me()
     {
-      $this->AuthService->me();  
+        $this->AuthService->me();
     }
 
-    public function updatePassword(UpdatePasswordRequest $request,User $user)
+    public function updatePassword(UpdatePasswordRequest $request, User $user)
     {
-      $this->AuthService->me($request,$user);  
+        $this->AuthService->me($request, $user);
     }
-  
 }

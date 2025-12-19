@@ -2,9 +2,9 @@
 
 namespace Modules\Product\Models;
 
-use Modules\Stock\Models\Stock;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Stock\Models\Stock;
 
 // use Modules\Product\Database\Factories\ProductFactory;
 
@@ -25,9 +25,13 @@ class Product extends Model
         'is_returnable',
     ];
 
+    // Castings
     protected $casts = [
         'additional_data' => 'array',
+        'is_returnable' => 'boolean',
     ];
+
+  
 
     /* ======================
        Scopes
@@ -76,6 +80,6 @@ class Product extends Model
 
     public function stock()
     {
-      return $this->hasOne(Stock::class);
+        return $this->hasOne(Stock::class);
     }
 }

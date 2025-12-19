@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Order\Http\Requests\V1;
+namespace Modules\User\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class OrderRequest extends FormRequest
+class VerifyOtpRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -12,9 +12,8 @@ class OrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-          'product_id' => ['required','exists:products,id'],
-          'unit_price' => ['required','numeric',"min:1"],
-          'total_amount' => ['required','numeric',"min:1"],
+           'email' => ['required', 'email', 'exists:users,email'],
+            'otp'   => ['required', 'digits:6'],
         ];
     }
 

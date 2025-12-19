@@ -1,12 +1,14 @@
 <?php
 
-namespace Modules\Product\App\Interface;
+namespace Modules\Product\App\Repository;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Modules\Product\App\Interfaces\ProductInterface;
 use Modules\Product\Models\Product;
 use Modules\Stock\Models\Stock;
 
-abstract class ProductRepository implements ProductInterface
+class ProductRepository implements ProductInterface
 {
     public function index()
     {
@@ -15,16 +17,18 @@ abstract class ProductRepository implements ProductInterface
 
     public function store($request)
     {
-        DB::transaction(function () use ($request) {
+        $data = $request->validated();
+        DB::transaction(function () use ($data) {
             $product = Product::create(
-                $request->validated()->except(['quantity', 'batch_no', 'expiry_date'])
+                array_diff_key($data, array_flip(['quantity', 'batch_no', 'expiry_date']))
             );
-            Stock::create(
-                array_merge(
-                    $request->validated()->only(['quantity', 'batch_no', 'expiry_date']),
-                    ['product_id' => $product->id]
-                )
-            );
+
+            Stock::create([
+                'product_id' => $product->id,
+                'quantity' => $data['quantity'],
+                'batch_no' => $data['batch_no'],
+                'expiry_date' => $data['expiry_date'],
+            ]);
         });
 
     }
@@ -36,14 +40,15 @@ abstract class ProductRepository implements ProductInterface
 
     public function update($request, $product)
     {
-            DB::transaction(function () use ($request,$product) {
+        $data = $request->validated();
+        DB::transaction(function () use ($product, $data) {
             $product->update(
-                $request->validated()->except(['quantity', 'batch_no', 'expiry_date'])
+                array_diff_key($data, array_flip(['quantity', 'batch_no', 'expiry_date']))
             );
-            $product?->stock->array_merge(
-                    $request->validated()->only(['quantity', 'batch_no', 'expiry_date']),
-                    ['product_id' => $product->id]
-                );
+            $product->stock()->updateOrCreate(
+                ['product_id' => $product->id],
+                Arr::only($data, ['quantity', 'batch_no', 'expiry_date'])
+            );
         });
 
     }

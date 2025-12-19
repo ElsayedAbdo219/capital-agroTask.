@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Product\App\Interface;
+namespace Modules\Product\App\Interfaces;
 
 interface ProductInterface
 {

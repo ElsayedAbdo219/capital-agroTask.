@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Product\Http\Controllers;
+namespace Modules\Product\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
 use App\Traits\ApiResponseTrait;
 use Modules\Product\Models\Product;
 use App\Http\Controllers\Controller;
 use Modules\Product\Http\Requests\V1\ProductRequest;
-use Modules\Product\App\Interface\ProductInterface;
+use Modules\Product\App\Interfaces\ProductInterface;
 class ProductController extends Controller
 {
       use ApiResponseTrait;
@@ -33,15 +33,11 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $this->checkOnProduct($product);
         $this->ProductRepository->show($product);
-
-        return $product->load(['orders']);
     }
 
     public function update(ProductRequest $request, Product $product)
     {
-        $this->checkOnProduct($product);
         $this->ProductRepository->update($request, $product);
 
         return $this->respondWithSuccess('Product Updated Successfully');
@@ -49,15 +45,10 @@ class ProductController extends Controller
 
     public function delete(Product $product)
     {
-        $this->checkOnProduct($product);
         $this->ProductRepository->delete($product);
 
         return $this->respondWithSuccess('Product Deleted Now');
     }
     
-    public function checkOnProduct($product)
-    {
-        if(!$product)
-        return self::respondWithErrors('Product Not Found');
-    }
+  
 }

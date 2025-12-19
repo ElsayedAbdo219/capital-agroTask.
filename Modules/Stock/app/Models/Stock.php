@@ -21,6 +21,11 @@ class Stock extends Model
         'expiry_date',
     ];
 
+    public function setExpiryDateAttribute($value)
+    {
+        $this->attributes['expiry_date'] = \Carbon\Carbon::createFromFormat('d-m-Y', $value)->format('Y-m-d');
+    }
+
     public function scopeFilter($query, array $filters)
     {
         foreach ($filters as $key => $value) {

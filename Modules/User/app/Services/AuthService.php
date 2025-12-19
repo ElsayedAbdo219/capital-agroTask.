@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\User\App\Services;
 
 use Modules\User\Models\User;
@@ -6,8 +7,9 @@ use App\Models\OtpAuthenticate;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
-class AuthService 
+class AuthService
 {
     use ApiResponseTrait;
 
@@ -32,72 +34,45 @@ class AuthService
             return response()->json(['message' => 'Invalid refresh token'], 403);
         }
         $user->tokens()->delete();
-    
+
     }
 
-    public function verifyOtp($request)
+    public function verifyOtp(string $email, string $otp): void
     {
-        $dataRequest = $request->validate([
-            'email' => 'required|email:filter|exists:users,email',
-            'otp' => 'required|digits:6',
-        ]);
-
-        $otpRecord = OtpAuthenticate::where('email', $dataRequest['email'])->latest()->first();
+        $otpRecord = OtpAuthenticate::where('email', $email)
+            ->latest()
+            ->first();
 
         if (! $otpRecord) {
-            return $this->errorUnauthorized('No OTP found.');
+            throw ValidationException::withMessages([
+                'otp' => 'No OTP found.',
+            ]);
         }
 
         if (now()->greaterThan($otpRecord->expiryDate)) {
-            return $this->errorUnauthorized('The OTP has expired.');
+            throw ValidationException::withMessages([
+                'otp' => 'The OTP has expired.',
+            ]);
         }
 
-        if ($dataRequest['otp'] != $otpRecord->otp) {
-            return $this->errorUnauthorized('Invalid OTP.');
+        if ($otp !== $otpRecord->otp) {
+            throw ValidationException::withMessages([
+                'otp' => 'Invalid OTP.',
+            ]);
         }
-        $user = User::where('email', $otpRecord->email)->first();
-        $user->email_verified_at = now();
-        $user->save();
-        $otpRecord->delete();
 
-        return $this->respondWithSuccess('User verified successfully!');
-    }
+        $user = User::where('email', $email)->firstOrFail();
 
-    public function verifyAccount($request)
-    {
-        $dataRequest = $request->validate([
-            'email' => 'required|email:filter|exists:users,email',
-            'otp' => 'required|digits:6',
+        $user->update([
+            'email_verified_at' => now(),
         ]);
 
-        $otpRecord = OtpAuthenticate::where('email', $dataRequest['email'])->latest()->first();
-
-        if (! $otpRecord) {
-            return $this->errorUnauthorized('No OTP found.');
-        }
-
-        if (now()->greaterThan($otpRecord->expiryDate)) {
-            return $this->errorUnauthorized('The OTP has expired.');
-        }
-
-        if ($dataRequest['otp'] != $otpRecord->otp) {
-            return $this->errorUnauthorized('Invalid OTP.');
-        }
-        $user = User::where('email', $otpRecord->email)->first();
-        $user->email_verified_at = now();
-        $user->save();
         $otpRecord->delete();
-        $user->tokens()->delete();
-        $accessToken = $user->createToken('access-token', ['*'], now()->addMinutes(60))->plainTextToken;
-        $refreshToken = $user->createToken('refresh-token', ['refresh'], now()->addDays(7))->plainTextToken;
 
-        return $this->respondWithSuccess('User verified successfully.', [
-            'access_token' => $accessToken,
-            'refresh_token' => $refreshToken,
-            'token_type' => 'Bearer',
-            'expires_in' => 60 * 60,
-        ]);
+        // Optional
+        // $this->refreshToken($user);
     }
+
 
     public function resendOtp($request)
     {
@@ -111,31 +86,32 @@ class AuthService
         // Mail::to($dataRequest['email'])->send(new OtpMail($otpRecord['otp'], $recipientName));
 
         return $this->respondWithSuccess('The Otp Resend Successfully',
-      [
-           'test-otp-only' => $otpRecord['otp'],
-      ]);
-    }
-    public function forgetPassword($request)
-    {
-        $dataRequest = $request->validate([
-            'email' => 'required|email:filter|exists:users,email',
-        ]);
-        OtpAuthenticate::where('email', $dataRequest['email'])->delete();
-
-        $otpRecord =  OtpAuthenticate::create([
-            'email' => $dataRequest['email'],
-            'otp' =>  mt_rand(100000, 999999),
-            'expiryDate' => now()->addMinutes(15),
-        ]);
-        $user = User::where('email', $dataRequest['email'])->first();
-
-        // إرسال OTP عبر البريد الإلكتروني
-        // Mail::to($dataRequest['email'])->send(new OtpMail($otp, $user));
-
-        return $this->respondWithSuccess(' OTP has been sent successfully',
             [
                 'test-otp-only' => $otpRecord['otp'],
             ]);
+    }
+
+    public function forgetPassword(string $email): array
+    {
+        OtpAuthenticate::where('email', $email)->delete();
+
+        $otp = mt_rand(100000, 999999);
+
+        OtpAuthenticate::create([
+            'email' => $email,
+            'otp' => $otp,
+            'expiryDate' => now()->addMinutes(15),
+        ]);
+
+        $user = User::where('email', $email)->first();
+
+        // هنا فقط Logic
+        // event(new SendOtpEvent($email, $otp));
+
+        return [
+            'otp' => $otp,
+            'user_exists' => (bool) $user,
+        ];
     }
 
     public function resetPassword($request)
@@ -152,10 +128,10 @@ class AuthService
 
     public function me()
     {
-      return auth('api')->user();
+        return auth('api')->user();
     }
 
-    public function updatePassword($request,$user)
+    public function updatePassword($request, $user)
     {
         $requestPasswordValidated = $request->validated();
         if ($user instanceof User) {
@@ -165,5 +141,4 @@ class AuthService
         }
         throw new \Exception('User Not Found Currently!');
     }
-
 }

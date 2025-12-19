@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\App\Repository;
+namespace Modules\App\Order\Repository;
 
 use Exception;
 use Illuminate\Support\Facades\DB;

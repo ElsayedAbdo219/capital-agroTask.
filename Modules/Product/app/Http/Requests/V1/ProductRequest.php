@@ -15,24 +15,24 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         $productTypes = implode(',',ProductStatus::toArray());
-        $productTypes = implode(',',FeedTypes::toArray());
+        $feedTypes = implode(',',FeedTypes::toArray());
         $animalTypes = implode(',', AnimalTypes::toArray());
 
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'sku' => ['required', 'string', 'max:100', 'unique:products,sku'],
+            'sku' => ['required', 'string', 'max:100', 'unique:products,sku' . ($this->product ? ',' . $this->product->id : '')],
             'price' => ['required', 'numeric', 'min:1'],
             'tax' => ['nullable', 'numeric', 'min:1', 'max:100'],
             'additional_data' => ['nullable', 'json'],
-            'feed_type' => ['required', 'string', 'in:'.$productTypes],
+            'feed_type' => ['required', 'string', 'in:'.$feedTypes],
             'animal_type' => ['required', 'string', 'in:'.$animalTypes],
             'weight_per_unit' => ['required', 'numeric', 'min:1'],
             'is_returnable' => ['boolean'],
             'status' => ['nullable', 'string', 'in:'.$productTypes],
             'quantity' => ['required', 'numeric', 'min:1'],
             'batch_no' => ['required', 'numeric'],
-            'expiry_date' =>  ['required', 'date','after:now'],
+            'expiry_date' =>  ['required','after:today'],
         ];
     }
 
