@@ -2,10 +2,10 @@
 
 namespace Modules\ReturnProduct\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\OrderItem\Models\OrderItem;
 use Modules\ReturnProduct\Enums\ReturnProductStatus;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 // use Modules\ReturnProduct\Database\Factories\ReturnProductFactory;
 
@@ -17,6 +17,7 @@ class ReturnProduct extends Model
         'order_item_id',
         'quantity',
         'reason',
+        'status',
     ];
 
     public function scopeFilter($query, array $filters)
@@ -33,7 +34,7 @@ class ReturnProduct extends Model
                     $query->where('reason', 'LIKE', "%{$value}%");
                     break;
                 case 'status':
-                    $query->whereIn('status',ReturnProductStatus::toArray());
+                    $query->whereIn('status', ReturnProductStatus::toArray());
                     break;
             }
         }
@@ -41,9 +42,10 @@ class ReturnProduct extends Model
         return $query;
     }
 
-    # Relations
+    // Relations
     public function orderItem()
     {
-      return $this->belongsTo(OrderItem::class);
+        return $this->belongsTo(OrderItem::class, 'order_item_id', 'id');
     }
+    
 }

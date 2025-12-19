@@ -21,19 +21,20 @@ class ReturnProductRepository implements ReturnProductInterface
 
     public function store($request)
     {
-        DB::beginTransaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $returnProduct = ReturnProduct::create($request->validated());
             Stock::where('product_id', $returnProduct?->orderItem?->product_id)->decrement('quantity',$returnProduct->quantity);
         });
+        return true;
     }
 
     public function update($request, $returnProduct) 
     {
-        DB::beginTransaction(function () use ($request ,  $returnProduct) {
+        DB::transaction(function () use ($request ,  $returnProduct) {
             $returnProduct?->update($request->validated());
             Stock::where('product_id', $returnProduct?->orderItem?->product_id)->decrement('quantity',$returnProduct->quantity);
         });
-
+          return true;
     }
 
     public function delete($returnProduct) 

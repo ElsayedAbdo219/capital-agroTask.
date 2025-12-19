@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\ReturnProduct\Http\Controllers;
+namespace Modules\ReturnProduct\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
 use App\Traits\ApiResponseTrait;
@@ -31,31 +31,24 @@ class ReturnProductController extends Controller
         return $this->respondWithSuccess('ReturnProduct Created Successfully');
     }
 
-    public function show(ReturnProduct $order)
+    public function show(ReturnProduct $returnProduct)
     {
-        $this->checkOnReturnProduct($order);
-        $this->ReturnProductRepository->show($order);
+        return $this->ReturnProductRepository->show($returnProduct);
     }
 
-    public function update(ReturnProductRequest $request, ReturnProduct $order)
+    public function update(ReturnProductRequest $request, ReturnProduct $returnProduct)
     {
-        $this->checkOnReturnProduct($order);
-        $this->ReturnProductRepository->update($request, $order);
+        $this->ReturnProductRepository->update($request, $returnProduct);
 
         return $this->respondWithSuccess('ReturnProduct Updated Successfully');
     }
 
-    public function delete(ReturnProduct $order)
+    public function delete(ReturnProduct $returnProduct)
     {
-        $this->checkOnReturnProduct($order);
-        $this->ReturnProductRepository->delete($order);
+        $this->ReturnProductRepository->delete($returnProduct);
 
         return $this->respondWithSuccess('ReturnProduct Deleted Now');
     }
 
-      public function checkOnReturnProduct($returnProduct)
-    {
-        if(!$returnProduct)
-        return self::respondWithErrors('ReturnProduct Not Found');
-    }
+  
 }
