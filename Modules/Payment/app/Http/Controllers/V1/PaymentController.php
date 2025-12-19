@@ -8,6 +8,7 @@ use Modules\Payment\Models\Payment;
 use App\Http\Controllers\Controller;
 use Modules\Payment\App\Services\PaymentService;
 use Modules\Payment\Http\Requests\CreateInvoiceRequest;
+use Modules\Payment\Http\Requests\V1\PayManuallyRequest;
 
 class PaymentController extends Controller
 {
@@ -37,6 +38,12 @@ class PaymentController extends Controller
         $this->PaymentService->handleWebhook($request);
         return $this->respondWithSuccess('Webhook Handled Successfully');
 
+    }
+
+    public function payManually(PayManuallyRequest $request)
+    {
+        $this->PaymentService->payManually($request);
+        return $this->respondWithSuccess('Manual Payment Recorded Successfully');
     }
 
   }

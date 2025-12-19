@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Invoice\Models\Invoice;
 use Modules\Payment\Models\Payment;
+use Modules\Payment\Enums\PaymentMethod;
 
 class PaymentService
 {
@@ -193,6 +194,42 @@ class PaymentService
 
         return hash_equals($generatedHash, $payload['hashKey']);
     }
+   
 
+    public function payManually($request)
+    {
+       $request->validated();
+        $order = Order::find($request->order_id);
+        $stock = Stock::where('product_id',$order->orderItem->product_id)->first();
+        if($order->total_amount < $request->amount ||   $order->orderItem()->sum('quantity') < $request->amount || $stock->quantity < $request->amount){  
+          // return $this->respondWithError(" Payment amount exceeds order total amount,try again!");
+          throw new \Exception(" Payment amount exceeds order total amount,try again!");
+        }
+
+        DB::beginTransaction();
+        try {
+            $payment = new Payment;
+            $payment->order_id = $request->order_id;
+            $payment->amount = $request->amount;
+            $payment->method = PaymentMethod::MANUAL;
+            $payment->status = 'paid';
+            $payment->save();
+
+            $order->update(['status' => 'paid','payment_status' => 'paid']);
+            $order->orderItem()->decrement('quantity',$order->total_amount);
+            $order->orderItem()->decrement('total_price',$order->total_amount * $order->unit_price);
+            $stock->decrement('quantity',$order->total_amount);
+            # notification to user about payment success can be added here
+            # notification to admin about manual payment can be added here
+            # notification to delivery can be known here.
+            DB::commit();
+
+            return $this->respondWithSuccess('Payment Processed Successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+           return $this->respondWithError(" Payment Processing Failed,try again!" ,['error' => $e->getMessage()]);
+        }
+    }
     
 }
