@@ -10,18 +10,21 @@ class UserRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
-    public function rules(): array
-    {
-        $userTypesArray = implode(',', UserType::toArray());
+  public function rules(): array
+{
+    $userTypesArray = implode(',', UserType::toArray());
 
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'unique:users,email,' . $this->route('user')->id],
-            'password' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'in:'.$userTypesArray],
-            'is_active' => ['nullable', 'boolean', 'in:0,1']
-        ]; 
-    }
+    $userId = $this->route('user') ? $this->route('user')->id : null;
+
+    return [
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'email', 'unique:users,email' . ($userId ? ',' . $userId : '')],
+        'password' => [$userId ? 'nullable' : 'required', 'string', 'min:6'],
+        'type' => ['required', 'in:' . $userTypesArray],
+        'is_active' => ['nullable', 'boolean', 'in:0,1']
+    ];
+}
+
 
     /**
      * Determine if the user is authorized to make this request.

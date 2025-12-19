@@ -3,6 +3,7 @@
 namespace Modules\Order\App\Repository;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Modules\Order\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Modules\OrderItem\Models\OrderItem;
@@ -12,17 +13,17 @@ class OrderRepository implements OrderInterface
 {
     public function index()
     {
-        return Order::orderByDesc('created_at')->cursorPaginate($request->paginateSize ?? 10);
+        return Order::orderByDesc('created_at')->with(['user'])->cursorPaginate($request->paginateSize ?? 10);
     }
 
     public function store($request)
     {
         $data = $request->validated();
         $data['user_id'] = auth('api')->id();
-        unset($data['product_id'],$data['unit_price']);
         try {
             DB::beginTransaction();
-            $order = Order::craete($data);
+            $dataExcept = Arr::except($data, ['product_id', 'unit_price']);
+            $order = Order::create($dataExcept);
             $orderItem = OrderItem::create(
                 [
                     'order_id' => $order->id,
@@ -43,33 +44,33 @@ class OrderRepository implements OrderInterface
 
     public function show($order)
     {
-        return $order;
+        return $order->load('user');
     }
 
-    public function update($request, $order)
-    {
-        $data = $request->validated();
-        $data['user_id'] = auth('api')->id();
-        unset($data['product_id'],$data['unit_price']);
-        try {
-            DB::beginTransaction();
-            $order->update($data);
-            $order->orderItem?->update(
-                [
-                    'product_id' => $data['product_id'],
-                    'quantity' => $data['total_amount'],
-                    'unit_price' => $data['unit_price'],
-                    'total_price' => $data['total_amount'] * $data['unit_price'],
-                ]
-            );
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollBack();
+  public function update($request, $order)
+{
+    $data = $request->validated();
+    $data['user_id'] = auth()->id();
+    
+    DB::transaction(function () use ($order, $data) {
 
-            return 'The Order Updating has Proplem , It'.$e;
-        }
-    }
+        $order->update(
+            Arr::except($data, ['product_id', 'unit_price', 'quantity'])
+        );
 
+        $order->orderItem()->updateOrCreate(
+            ['order_id' => $order->id],
+            [
+                'product_id'  => $data['product_id'],
+                'quantity'    => $data['total_amount'],
+                'unit_price'  => $data['unit_price'],
+                'total_price' => $data['total_amount'] * $data['unit_price'],
+            ]
+        );
+    });
+
+    // return true;
+}
     public function delete($order)
     {
         $order->delete();

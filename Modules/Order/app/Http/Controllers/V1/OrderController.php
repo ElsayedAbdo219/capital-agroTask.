@@ -27,37 +27,29 @@ class OrderController extends Controller
 
     public function store(OrderRequest $request)
     {
-        $this->OrderInterface->store($request);
+      $result =   $this->OrderInterface->store($request);
 
         return $this->respondWithSuccess('Order Created Successfully');
     }
 
     public function show(Order $order)
     {
-        $this->checkOnOrder($order);
         $this->OrderInterface->show($order);
     }
 
     public function update(OrderRequest $request, Order $order)
     {
-        $this->checkOnOrder($order);
-        $this->OrderInterface->update($request, $order);
+       $result =  $this->OrderInterface->update($request, $order);
 
         return $this->respondWithSuccess('Order Updated Successfully');
     }
 
     public function delete(Order $order)
     {
-        $this->checkOnOrder($order);
         $this->OrderInterface->delete($order);
 
         return $this->respondWithSuccess('Order Deleted Now');
     }
-
-      public function checkOnOrder($order)
-    {
-        if(!$order)
-        return self::respondWithErrors('Order Not Found');
-    }
+    
     
 }
