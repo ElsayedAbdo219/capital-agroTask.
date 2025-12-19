@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\App\Services;
+namespace Modules\Payment\App\Services;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -39,7 +39,7 @@ class PaymentService
         return response()->json(json_decode($response, true));
     }
 
-    public function createInvoice(Request $request)
+    public function createInvoice($request)
     {
         $request->validated();
         $order = Order::find($request->order_id);
@@ -137,7 +137,7 @@ class PaymentService
         }
     }
 
-    public function handleWebhook(Request $request)
+    public function handleWebhook($request)
     {
         $payload = $request->all();
         \Log::info('Webhook Payload:', $payload);

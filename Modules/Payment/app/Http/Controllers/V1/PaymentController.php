@@ -1,56 +1,42 @@
 <?php
 
-namespace Modules\Payment\Http\Controllers;
+namespace Modules\Payment\Http\Controllers\V1;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Traits\ApiResponseTrait;
+use Modules\Payment\Models\Payment;
+use App\Http\Controllers\Controller;
+use Modules\Payment\App\Services\PaymentService;
+use Modules\Payment\Http\Requests\CreateInvoiceRequest;
 
 class PaymentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+      use ApiResponseTrait;
+
+    protected $PaymentService;
+
+    public function __construct(PaymentService $PaymentService)
     {
-        return view('payment::index');
+        $this->PaymentService = $PaymentService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getMethods(Request $request)
     {
-        return view('payment::create');
+        return $this->PaymentService->getMethods();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function createInvoice(CreateInvoiceRequest $request)
     {
-        return view('payment::show');
+      $result =   $this->PaymentService->createInvoice($request);
+
+        return $this->respondWithSuccess('Payment Created Successfully');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function handleWebhook(Request $request)
     {
-        return view('payment::edit');
+        $this->PaymentService->handleWebhook($request);
+        return $this->respondWithSuccess('Webhook Handled Successfully');
+
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
-}
+  }

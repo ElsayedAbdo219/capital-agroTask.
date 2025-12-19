@@ -1,8 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Payment\Http\Controllers\PaymentController;
+use Modules\Payment\Http\Controllers\V1\PaymentController;
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('payments', PaymentController::class)->names('payment');
+  Route::prefix('payments')->group(function () {
+    Route::get('getMethods', [PaymentController::class,'getMethods'])->name('getMethods');
+    Route::post('createInvoice', [PaymentController::class, 'createInvoice'])->name('payments.createInvoice');
 });
+});
+Route::post('webhook_json', [PaymentController::class, 'createInvoice'])->name('payments.webhook_json');
