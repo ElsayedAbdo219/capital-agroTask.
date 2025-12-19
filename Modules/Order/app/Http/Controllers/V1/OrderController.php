@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Modules\Order\Models\Order;
 use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
-use Modules\App\Interface\OrderInterface;
+use Modules\Order\App\Interfaces\OrderInterface;
 use Modules\Order\Http\Requests\V1\OrderRequest;
 
 class OrderController extends Controller

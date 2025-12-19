@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\App\Order\Repository;
+namespace Modules\Order\App\Repository;
 
 use Exception;
-use Illuminate\Support\Facades\DB;
-use Modules\App\Interface\OrderInterface;
 use Modules\Order\Models\Order;
+use Illuminate\Support\Facades\DB;
 use Modules\OrderItem\Models\OrderItem;
+use Modules\Order\App\Interfaces\OrderInterface;
 
 class OrderRepository implements OrderInterface
 {

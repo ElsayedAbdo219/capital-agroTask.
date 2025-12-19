@@ -20,8 +20,15 @@ class User extends Authenticatable
         'email',
         'password',
         'type',
+        'email_verified_at'
     ];
-
+     protected $hidden = [
+        'password',
+    ];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
   
    
     # Scopes

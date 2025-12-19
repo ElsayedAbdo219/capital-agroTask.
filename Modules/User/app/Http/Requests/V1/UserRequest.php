@@ -12,16 +12,15 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userTypesArray = UserType::toArray();
-        $userTypes = implode(',', $userTypesArray);
+        $userTypesArray = implode(',', UserType::toArray());
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'unique:users,'.$this->user],
+            'email' => ['required', 'string', 'email', 'unique:users,email,' . $this->route('user')->id],
             'password' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'in:'.$userTypes],
+            'type' => ['required', 'in:'.$userTypesArray],
             'is_active' => ['nullable', 'boolean', 'in:0,1']
-        ];
+        ]; 
     }
 
     /**

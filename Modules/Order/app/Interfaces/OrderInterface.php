@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\App\Interface;
+namespace Modules\Order\App\Interfaces;
 
 interface OrderInterface
 {

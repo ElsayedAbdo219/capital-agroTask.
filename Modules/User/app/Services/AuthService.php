@@ -37,7 +37,7 @@ class AuthService
 
     }
 
-    public function verifyOtp(string $email, string $otp): void
+    public function verifyOtp(string $email, string $otp)
     {
         $otpRecord = OtpAuthenticate::where('email', $email)
             ->latest()
@@ -68,9 +68,16 @@ class AuthService
         ]);
 
         $otpRecord->delete();
-
-        // Optional
-        // $this->refreshToken($user);
+        // create tokens for user
+        $accessToken = $user->createToken('access-token', ['*'], now()->addMinutes(60))->plainTextToken;
+        $refreshToken = $user->createToken('refresh-token', ['refresh'], now()->addDays(7))->plainTextToken;
+        return [
+            'user' => $user,
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'token_type' => 'Bearer',
+            'expires_in' => 60 * 60, // 1 hour
+        ];
     }
 
 

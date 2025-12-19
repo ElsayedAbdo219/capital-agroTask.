@@ -8,7 +8,7 @@ use App\Models\OtpAuthenticate;
 use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use Modules\User\App\Services\AuthService;
-use Modules\User\Http\Requests\VerifyOtpRequest;
+use Modules\User\Http\Requests\V1\VerifyOtpRequest;
 use Modules\User\Http\Requests\V1\LoginClientRequest;
 use Modules\User\Http\Requests\V1\ResetPasswordRequest;
 use Modules\User\Http\Requests\V1\ForgetPasswordRequest;
@@ -59,20 +59,20 @@ class AuthController extends Controller
 
    public function verifyOtp(VerifyOtpRequest $request)
     {
-        $this->AuthService->verifyOtp(
+        $result = $this->AuthService->verifyOtp(
             $request->validated('email'),
             $request->validated('otp')
         );
-      return $this->respondWithSuccess('User verified successfully!');
+      return $this->respondWithSuccess('User verified successfully!', [
+            'user' => $result['user'],
+            'access_token' => $result['access_token'],
+            'refresh_token' => $result['refresh_token'],
+            'token_type' => 'Bearer',
+            'expires_in' => 60 * 60, // 1 hour
+      ]);
     }
 
-
-    
-
-    public function verifyAccount(Request $request)
-    {
-        $this->AuthService->verifyAccount($request);
-    }
+  
 
     public function resendOtp(Request $request)
     {

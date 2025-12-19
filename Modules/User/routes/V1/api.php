@@ -15,6 +15,6 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
       Route::post('/',[UserController::class,'store']);
       Route::get('/{user}',[UserController::class,'show']);
       Route::put('/{user}',[UserController::class,'update']);
-      Route::delete('/',[UserController::class,'destroy']);
+      Route::delete('/{user}',[UserController::class,'destroy']);
     });
 });

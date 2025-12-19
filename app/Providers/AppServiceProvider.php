@@ -3,13 +3,13 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Modules\App\Interface\OrderInterface;
 
 use Modules\App\Interface\DeliveryInterface;
 use Modules\App\Repository\DeliveryRepository;
 use Modules\User\App\Interfaces\UserInterface;
-use Modules\User\App\Interfaces\UserRepository;
-use Modules\App\Order\Repository\OrderRepository;
+use Modules\User\App\Repository\UserRepository;
+use Modules\Order\App\Interfaces\OrderInterface;
+use Modules\Order\App\Repository\OrderRepository;
 use Modules\Product\App\Interfaces\ProductInterface;
 use Modules\Product\App\Repository\ProductRepository;
 use Modules\ReturnProduct\App\Interface\ReturnProductInterface;
