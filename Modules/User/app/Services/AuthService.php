@@ -21,9 +21,19 @@ class AuthService
         if (! $user || ! Hash::check($loginuserData['password'], $user->password)) {
             return $this->errorUnauthorized('Invalid Credentials');
         }
-        if ($user->is_Active == 0) {
-            return $this->errorUnauthorized('Invalid Credentials');
-        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->tokens()->delete();
+        $accessToken = $user->createToken('access-token', ['*'], now()->addMinutes(60))->plainTextToken;
+        $refreshToken = $user->createToken('refresh-token', ['refresh'], now()->addDays(7))->plainTextToken;
+        return $this->respondWithSuccess('User Logged In Successfully', [
+            'user' => $user,
+            'access_token' => $accessToken ,
+            'refresh_token' => $refreshToken  ,
+            'token_type' => 'Bearer',
+            'expires_in' => 60 * 60, // 1 ساعة
+        ]);
+
     }
 
     public function refreshToken($request)
@@ -68,7 +78,6 @@ class AuthService
         ]);
 
         $otpRecord->delete();
-        // create tokens for user
         $accessToken = $user->createToken('access-token', ['*'], now()->addMinutes(60))->plainTextToken;
         $refreshToken = $user->createToken('refresh-token', ['refresh'], now()->addDays(7))->plainTextToken;
         return [
@@ -125,6 +134,7 @@ class AuthService
     {
         $dataRequest = $request->validated();
         $user = $request->user();
+        // dd($user , $dataRequest['password'] );
         $user->password = Hash::make($dataRequest['password']);
         $user->save();
         OtpAuthenticate::where('email', $user->email)->delete();

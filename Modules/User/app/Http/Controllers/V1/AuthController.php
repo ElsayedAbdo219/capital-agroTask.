@@ -27,19 +27,8 @@ class AuthController extends Controller
 
     public function login(LoginClientRequest $request)
     {
-        $this->AuthService->login($request);
-        $user = User::where('email', $request->email)->first();
-        $user->tokens()->delete();
-        $accessToken = $user->createToken('access-token', ['*'], now()->addMinutes(60))->plainTextToken;
-        $refreshToken = $user->createToken('refresh-token', ['refresh'], now()->addDays(7))->plainTextToken;
-
-        return $this->respondWithSuccess('User Logged In Successfully', [
-            'user' => $user,
-            'access_token' => $accessToken,
-            'refresh_token' => $refreshToken,
-            'token_type' => 'Bearer',
-            'expires_in' => 60 * 60, // 1 ساعة
-        ]);
+        $result = $this->AuthService->login($request);
+        return $result;
     }
 
     public function refreshToken(Request $request)
@@ -95,12 +84,13 @@ class AuthController extends Controller
 
     public function resetPassword(ResetPasswordRequest $request)
     {
-        $this->AuthService->resetPassword($request);
+      $this->AuthService->resetPassword($request);
+        return $this->respondWithSuccess('User Reset Password successfully!');
     }
 
     public function me()
     {
-        $this->AuthService->me();
+        return $this->AuthService->me();
     }
 
     public function updatePassword(UpdatePasswordRequest $request, User $user)
